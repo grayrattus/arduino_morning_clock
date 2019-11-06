@@ -35,8 +35,9 @@ void setup() {
     if (!RTC.isrunning()) {
         Serial.println("RTC is NOT running!");
         // This will reflect the time that your sketch was compiled
-        RTC.adjust(DateTime(__DATE__, __TIME__));
+        return;
     }
+    RTC.adjust(DateTime(__DATE__, __TIME__));
 }
 
 void loop() {
@@ -54,7 +55,7 @@ void loop() {
     lcd.print(second);
 
     lcd.setCursor(0, 1);
-    if (timerManager.isDateValid()) {
+    if (timerManager.isTimeAccepted() && timerManager.isDateValid()) {
         uint8_t hours = timerManager.getHours();
         uint8_t minutes = timerManager.getMinutes();
         uint8_t seconds = timerManager.getSeconds();

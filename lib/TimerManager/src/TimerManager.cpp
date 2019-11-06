@@ -6,14 +6,20 @@ void TimerManager::setDateIfSerialAvailable() {
     if (Serial.available() > 0) {
         // read the incoming byte:
         uint8_t readed = Serial.read();
+        this->timeAccepted = false;
         Serial.print(readed);
+        if(readed == 13 || readed == 10){
+            this->timeAccepted = true;
+            return;
+        }
         if (this->currentSetDate.length() < 8) {
             if (readed == 8 && this->currentSetDate.length() > 0) {
                 this->currentSetDate.remove(this->currentSetDate.length() - 1);
             } else {
                 this->currentSetDate.concat((char)readed);
             }
-        } else {
+        }
+        else {
             this->currentSetDate = "";
             this->currentSetDate.concat((char)readed);
         }
@@ -30,6 +36,10 @@ boolean TimerManager::isDateValid() {
                ':' &&
            this->getHours() < 24 && this->getMinutes() < 60 &&
            this->getSeconds() < 60;
+}
+
+boolean TimerManager::isTimeAccepted() {
+    return this->timeAccepted;
 }
 
 uint8_t TimerManager::getHours() {

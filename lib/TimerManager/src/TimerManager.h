@@ -15,6 +15,7 @@ class TimerManager {
         uint8_t getSeconds();
         uint8_t getHours();
         void ring(uint8_t hours, uint8_t minutes, uint8_t seconds);
+        boolean isTimeAccepted();
     private:
         uint8_t playbackTime = 0;
         String currentSetDate = "00:00:00";
@@ -22,5 +23,6 @@ class TimerManager {
         const uint8_t POSITION_OF_SECOND_SEMICOLON = 5;
         TMRpcm* tmrpcm;
         boolean shouldPlay = false;
+        boolean timeAccepted = false;
 };
 #endif
