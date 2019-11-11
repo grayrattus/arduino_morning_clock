@@ -1,39 +1,39 @@
 #include "MenuManager.h"
+#include "Constants.h"
+#include "SerialInputOutputTemplate.h"
 
-MenuManager::MenuManager(SoftwareSerial* pcSerial) {
-    this->pcSerial = pcSerial;
+MenuManager::MenuManager(SoftwareSerial* pcSerial)
+    : SerialInputOutputTemplate(pcSerial) {
     this->currentCommand = MenuCommands::MENU;
 }
 
-void MenuManager::setMenuCommandIfSerialAvailable() {
-    if (this->pcSerial->available() > 0) {
-        uint8_t readed = this->pcSerial->read();
-        this->pcSerial->print((char)readed);
-        if (readed == 13 || readed == 10) {
-            this->setCurrentCommand(this->currentInputMenu);
-            this->currentInputMenu = "";
-        } else if (readed == 8) {
-            if (this->currentInputMenu.length() > 0) {
-                this->pcSerial->print((char)13);
-                this->currentInputMenu.remove(this->currentInputMenu.length() -
-                                              1);
-                this->pcSerial->print("       ");
-                this->pcSerial->print((char)13);
-                this->pcSerial->print(this->currentInputMenu);
-            }
-        } else {
-            this->currentInputMenu.concat((char)readed);
-        }
+void MenuManager::handleEnter() {
+    this->setCurrentCommand(this->currentInputMenu);
+    this->currentInputMenu = "";
+}
+
+void MenuManager::handleBackspace() {
+    if (this->currentInputMenu.length() > 0) {
+        SoftwareSerial* pcSerial = this->getPcSerial();
+        pcSerial->print((char)ASCII_LINE_FEED);
+        currentInputMenu.remove(this->currentInputMenu.length() - 1);
+        pcSerial->print("       ");
+        pcSerial->print((char)ASCII_LINE_FEED);
+        pcSerial->print(this->currentInputMenu);
     }
+}
+
+void MenuManager::handleChange(uint8_t readed) {
+    this->currentInputMenu.concat((char)readed);
 }
 
 MenuCommands MenuManager::getCommand(String inputCommand) {
     if (inputCommand.compareTo("menu") == 0) {
-        return MENU;
+        return MenuCommands::MENU;
     } else if (inputCommand.compareTo("pring") == 0) {
-        return PRING;
+        return MenuCommands::PRING;
     } else if (inputCommand.compareTo("pset") == 0) {
-        return PSET_DATE;
+        return MenuCommands::PSET;
     }
     return MenuCommands::NONE_PRINT;
 }
@@ -45,7 +45,7 @@ void MenuManager::setMenuCommand(MenuCommands command) {
 }
 
 void MenuManager::setCurrentCommand(String inputCommand) {
-    this->pcSerial->println("Set command:" + inputCommand);
+    this->getPcSerial()->println("Set command:" + inputCommand);
     this->setMenuCommand(this->getCommand(inputCommand));
 }
 
@@ -54,7 +54,7 @@ String MenuManager::getUserOutputForCommand() {
         case (MenuCommands::MENU):
             return this->outputMenuString;
             break;
-        case (MenuCommands::PSET_DATE):
+        case (MenuCommands::PSET):
             return this->outputInputDateString;
             break;
         case (MenuCommands::PRING):

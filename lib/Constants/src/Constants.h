@@ -1,0 +1,8 @@
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
+
+#define ASCII_NEW_LINE 13
+#define ASCII_LINE_FEED 10
+#define ASCII_BACKSPACE 8
+
+#endif

@@ -2,20 +2,23 @@
 #define MENU_MANAGER_H
 
 #include <Arduino.h>
+#include <SerialInputOutputTemplate.h>
 #include <SoftwareSerial.h>
 #include <TMRpcm.h>
 #include <WString.h>
 
-enum MenuCommands { MENU, PRING, PSET_DATE, NONE_PRINT };
+enum MenuCommands { MENU, PRING, PSET, NONE_PRINT };
 
-class MenuManager {
+class MenuManager: public SerialInputOutputTemplate {
    public:
     MenuManager(SoftwareSerial* pcSerial);
     static MenuCommands getCommand(String inputCommand);
     MenuCommands getCurrentCommand();
     String getUserOutputForCommand();
-    void setMenuCommandIfSerialAvailable();
     void setMenuCommand(MenuCommands command);
+    virtual void handleEnter();
+    virtual void handleBackspace();
+    virtual void handleChange(uint8_t readed);
 
    private:
     MenuCommands currentCommand;
@@ -24,7 +27,6 @@ class MenuManager {
     String outputInputDateString = "Put date:";
     String outputRighDateString = "Showing ring date";
     void setCurrentCommand(String inputCommand);
-    SoftwareSerial* pcSerial;
 };
 
 #endif

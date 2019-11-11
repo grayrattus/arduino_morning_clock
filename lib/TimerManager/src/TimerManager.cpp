@@ -1,4 +1,5 @@
 #include "TimerManager.h"
+#include "Constants.h"
 
 TimerManager::TimerManager(TMRpcm* tmrpcm, SoftwareSerial* pcSerial) {
     this->tmrpcm = tmrpcm;
@@ -10,18 +11,18 @@ void TimerManager::setDateIfSerialAvailable() {
         uint8_t readed = this->pcSerial->read();
         this->timeAccepted = false;
         this->pcSerial->print((char)readed);
-        if (readed == 13 || readed == 10) {
+        if (readed == ASCII_NEW_LINE || readed == ASCII_LINE_FEED) {
             if (this->isDateValid()) {
                 this->timeAccepted = true;
                 this->acceptedDate = this->currentSetDate;
                 this->pcSerial->println();
             }
-        } else if (readed == 8) {
+        } else if (readed == ASCII_BACKSPACE) {
             if (this->currentSetDate.length() > 0) {
-                this->pcSerial->print((char)13);
+                this->pcSerial->print((char)ASCII_LINE_FEED);
                 this->currentSetDate.remove(this->currentSetDate.length() - 1);
                 this->pcSerial->print("        ");
-                this->pcSerial->print((char)13);
+                this->pcSerial->print((char)ASCII_LINE_FEED);
                 this->pcSerial->print(this->currentSetDate);
             }
         } else {

@@ -22,7 +22,7 @@ TimerManager timerManager(&tmrpcm, &pcSerial);
 const int rs = 7, en = 6, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
-void printDateFromRtc(uint8_t hour, uint8_t minute, uint8_t second) {
+void printTimeFromRtc(uint8_t hour, uint8_t minute, uint8_t second) {
     lcd.setCursor(0, 0);
     lcd.print("                ");
     lcd.setCursor(0, 0);
@@ -43,7 +43,9 @@ void setup() {
         return;
     }
     // set up the LCD's number of columns and rows:
-    lcd.begin(16, 2);
+    const int NUM_COLS = 16;
+    const int NUM_ROWS = 2;
+    lcd.begin(NUM_COLS, NUM_ROWS);
     // Print a message to the LCD.
     RTC.begin();
     // Check to see if the RTC is keeping time.  If it is, load the time from
@@ -51,9 +53,9 @@ void setup() {
     if (!RTC.isrunning()) {
         pcSerial.println("RTC is NOT running!");
         // This will reflect the time that your sketch was compiled
-        RTC.adjust(DateTime(__DATE__, __TIME__));
         return;
     }
+    RTC.adjust(DateTime(__DATE__, __TIME__));
     lcd.setCursor(0, 1);
     lcd.print("Date:" + timerManager.getCurrentSetDate());
 }
@@ -64,9 +66,9 @@ void loop() {
     uint8_t minute = now.minute();
     uint8_t second = now.second();
     timerManager.ring(hour, minute, second);
-    printDateFromRtc(hour, minute, second);
+    printTimeFromRtc(hour, minute, second);
 
-    menuManager.setMenuCommandIfSerialAvailable();
+    menuManager.setIfSerialAvailable();
 
     const MenuCommands currentCommand = menuManager.getCurrentCommand();
 
@@ -75,10 +77,10 @@ void loop() {
         pcSerial.println("menu - show menu");
         pcSerial.println("pring - show time of ring");
         pcSerial.println("pset - set ring");
-        menuManager.setMenuCommand(MenuCommands::PRING);
+        menuManager.setMenuCommand(MenuCommands::NONE_PRINT);
     }
 
-    if (currentCommand == MenuCommands::PSET_DATE) {
+    if (currentCommand == MenuCommands::PSET) {
         timerManager.startSettingNewDate();
         while (!timerManager.isTimeAccepted()) {
             timerManager.setDateIfSerialAvailable();
@@ -87,7 +89,7 @@ void loop() {
             uint8_t lminute = lnow.minute();
             uint8_t lsecond = lnow.second();
             timerManager.ring(lhour, lminute, lsecond);
-            printDateFromRtc(lhour, lminute, lsecond);
+            printTimeFromRtc(lhour, lminute, lsecond);
             lcd.setCursor(0, 1);
             lcd.print("                ");
             lcd.setCursor(0, 1);
