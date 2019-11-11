@@ -10,7 +10,6 @@ MenuManager::MenuManager(CustomSoftwareSerial* pcSerial)
 void MenuManager::handleEnter() {
     this->setCurrentCommand(this->currentInputMenu);
     this->currentInputMenu = "";
-    this->getPcSerial()->println();
 }
 
 void MenuManager::handleBackspace() {
@@ -33,6 +32,8 @@ MenuCommands MenuManager::getCommand(String inputCommand) {
         return MenuCommands::PRING;
     } else if (inputCommand.compareTo("pset") == 0) {
         return MenuCommands::PSET;
+    } else if (inputCommand.compareTo("cset") == 0) {
+        return MenuCommands::CSET;
     }
     return MenuCommands::NONE_PRINT;
 }

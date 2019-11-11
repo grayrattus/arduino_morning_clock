@@ -8,6 +8,7 @@
 #include <Constants.h>
 #include <TMRpcm.h>
 #include <TimerManager.h>
+#include <ClockManager.h>
 #include <Wire.h>
 
 #define SD_ChipSelectPin 10
@@ -70,7 +71,21 @@ void loop() {
         pcSerial.println(F("menu - show menu"));
         pcSerial.println(F("pring - show time of ring"));
         pcSerial.println(F("pset - set ring"));
+        pcSerial.println(F("cset - set clock"));
         menuManager.setMenuCommand(MenuCommands::NONE_PRINT);
+    }
+
+    if (currentCommand == MenuCommands::CSET) {
+        ClockManager clockManager(&RTC, &pcSerial);
+        clockManager.startSettingNewDate();
+        while (!clockManager.isTimeAccepted()) {
+            clockManager.setIfSerialAvailable();
+            lcdClear(1, lcd);
+            lcd.print("Clock: " + clockManager.getCurrentSetDate());
+            delay(100);
+        }
+        clockManager.sendSetDateToClock();
+        menuManager.setMenuCommand(MenuCommands::PRING);
     }
 
     if (currentCommand == MenuCommands::PSET) {

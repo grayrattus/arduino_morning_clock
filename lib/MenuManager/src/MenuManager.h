@@ -7,7 +7,7 @@
 #include <TMRpcm.h>
 #include <WString.h>
 
-enum MenuCommands { MENU, PRING, PSET, NONE_PRINT };
+enum MenuCommands { MENU, PRING, PSET, CSET, NONE_PRINT };
 
 class MenuManager: public SerialInputOutputTemplate {
    public:
