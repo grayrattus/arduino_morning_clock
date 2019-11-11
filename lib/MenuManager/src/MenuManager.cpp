@@ -57,9 +57,6 @@ String MenuManager::getUserOutputForCommand() {
         case (MenuCommands::PSET):
             return this->outputInputDateString;
             break;
-        case (MenuCommands::PRING):
-            return this->outputRighDateString;
-            break;
     }
     return "";
 }

@@ -25,7 +25,6 @@ class MenuManager: public SerialInputOutputTemplate {
     String currentInputMenu = "";
     String outputMenuString = "Menu description";
     String outputInputDateString = "Put date:";
-    String outputRighDateString = "Showing ring date";
     void setCurrentCommand(String inputCommand);
 };
 

@@ -69,7 +69,6 @@ void loop() {
     if (currentCommand == MenuCommands::MENU) {
         pcSerial.println(menuManager.getUserOutputForCommand());
         pcSerial.println(F("menu - show menu"));
-        pcSerial.println(F("pring - show time of ring"));
         pcSerial.println(F("pset - set ring"));
         pcSerial.println(F("cset - set clock"));
         menuManager.setMenuCommand(MenuCommands::NONE_PRINT);
@@ -105,7 +104,6 @@ void loop() {
         menuManager.setMenuCommand(MenuCommands::PRING);
     }
     if (currentCommand == MenuCommands::PRING) {
-
         uint8_t hours = timerManager.getAcceptedTimeHours();
         uint8_t minutes = timerManager.getAcceptedTimeMinutes();
         uint8_t seconds = timerManager.getAcceptedTimeSeconds();
