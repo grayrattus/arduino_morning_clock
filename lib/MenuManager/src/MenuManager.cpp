@@ -2,7 +2,7 @@
 #include "Constants.h"
 #include "SerialInputOutputTemplate.h"
 
-MenuManager::MenuManager(SoftwareSerial* pcSerial)
+MenuManager::MenuManager(CustomSoftwareSerial* pcSerial)
     : SerialInputOutputTemplate(pcSerial) {
     this->currentCommand = MenuCommands::NONE_PRINT;
 }
@@ -10,15 +10,14 @@ MenuManager::MenuManager(SoftwareSerial* pcSerial)
 void MenuManager::handleEnter() {
     this->setCurrentCommand(this->currentInputMenu);
     this->currentInputMenu = "";
+    this->getPcSerial()->println();
 }
 
 void MenuManager::handleBackspace() {
     if (this->currentInputMenu.length() > 0) {
-        SoftwareSerial* pcSerial = this->getPcSerial();
-        pcSerial->print((char)ASCII_LINE_FEED);
+        CustomSoftwareSerial* pcSerial = this->getPcSerial();
+        clearPreviousLine(pcSerial);
         currentInputMenu.remove(this->currentInputMenu.length() - 1);
-        pcSerial->print("       ");
-        pcSerial->print((char)ASCII_LINE_FEED);
         pcSerial->print(this->currentInputMenu);
     }
 }
@@ -45,7 +44,7 @@ void MenuManager::setMenuCommand(MenuCommands command) {
 }
 
 void MenuManager::setCurrentCommand(String inputCommand) {
-    this->getPcSerial()->println("Set command:" + inputCommand);
+    this->getPcSerial()->println();
     this->setMenuCommand(this->getCommand(inputCommand));
 }
 

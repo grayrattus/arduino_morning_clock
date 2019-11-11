@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <SerialInputOutputTemplate.h>
-#include <SoftwareSerial.h>
+#include <CustomSoftwareSerial.h>
 #include <TMRpcm.h>
 #include <WString.h>
 
@@ -11,7 +11,7 @@ enum MenuCommands { MENU, PRING, PSET, NONE_PRINT };
 
 class MenuManager: public SerialInputOutputTemplate {
    public:
-    MenuManager(SoftwareSerial* pcSerial);
+    MenuManager(CustomSoftwareSerial* pcSerial);
     static MenuCommands getCommand(String inputCommand);
     MenuCommands getCurrentCommand();
     String getUserOutputForCommand();

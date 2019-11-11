@@ -1,7 +1,7 @@
 #include "SerialInputOutputTemplate.h"
 #include "Constants.h"
 
-SerialInputOutputTemplate::SerialInputOutputTemplate(SoftwareSerial* pcSerial) {
+SerialInputOutputTemplate::SerialInputOutputTemplate(CustomSoftwareSerial* pcSerial) {
     this->pcSerial = pcSerial;
 }
 
@@ -20,7 +20,7 @@ void SerialInputOutputTemplate::setIfSerialAvailable() {
     }
 }
 
-SoftwareSerial* SerialInputOutputTemplate::getPcSerial() {
+CustomSoftwareSerial* SerialInputOutputTemplate::getPcSerial() {
     return this->pcSerial;
 }
 

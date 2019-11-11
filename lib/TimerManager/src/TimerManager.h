@@ -3,13 +3,13 @@
 
 #include <Arduino.h>
 #include <SerialInputOutputTemplate.h>
-#include <SoftwareSerial.h>
+#include <CustomSoftwareSerial.h>
 #include <TMRpcm.h>
 #include <WString.h>
 
 class TimerManager : public SerialInputOutputTemplate {
    public:
-    TimerManager(TMRpcm* tmrpcm, SoftwareSerial* pcSerial);
+    TimerManager(TMRpcm* tmrpcm, CustomSoftwareSerial* pcSerial);
     String getCurrentSetDate();
     String getAcceptedDate();
     boolean isDateValid();

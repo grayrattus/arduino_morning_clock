@@ -4,7 +4,8 @@
 #include <RTClib.h>
 #include <SD.h>
 #include <SPI.h>
-#include <SoftwareSerial.h>
+#include <CustomSoftwareSerial.h>
+#include <Constants.h>
 #include <TMRpcm.h>
 #include <TimerManager.h>
 #include <Wire.h>
@@ -12,20 +13,15 @@
 #define SD_ChipSelectPin 10
 RTC_DS1307 RTC;
 TMRpcm tmrpcm;
-SoftwareSerial pcSerial(0, 1);
+CustomSoftwareSerial pcSerial(0, 1);
 MenuManager menuManager(&pcSerial);
 TimerManager timerManager(&tmrpcm, &pcSerial);
-
-// initialize the library by associating any needed LCD interface pin
-// with the arduino pin number it is connected to
 
 const int rs = 7, en = 6, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 void printTimeFromRtc(uint8_t hour, uint8_t minute, uint8_t second) {
-    lcd.setCursor(0, 0);
-    lcd.print("                ");
-    lcd.setCursor(0, 0);
+    lcdClear(0, lcd);
     lcd.print(hour);
     lcd.print(':');
     lcd.print(minute);
@@ -35,8 +31,7 @@ void printTimeFromRtc(uint8_t hour, uint8_t minute, uint8_t second) {
 
 void setup() {
     tmrpcm.speakerPin = 9;
-    pcSerial.begin(9600);
-    pcSerial.println("Restarting");
+    pcSerial.begin(9600, CSERIAL_8N1);
 
     if (!SD.begin(SD_ChipSelectPin)) {
         pcSerial.print("SD fail");
@@ -51,13 +46,11 @@ void setup() {
     // Check to see if the RTC is keeping time.  If it is, load the time from
     // your computer.
     if (!RTC.isrunning()) {
-        pcSerial.println("RTC is NOT running!");
+        pcSerial.println("RTC fail");
         // This will reflect the time that your sketch was compiled
         RTC.adjust(DateTime(__DATE__, __TIME__));
         return;
     }
-    lcd.setCursor(0, 1);
-    lcd.print("Date:" + timerManager.getAcceptedDate());
 }
 
 void loop() {
@@ -74,9 +67,9 @@ void loop() {
 
     if (currentCommand == MenuCommands::MENU) {
         pcSerial.println(menuManager.getUserOutputForCommand());
-        pcSerial.println("menu - show menu");
-        pcSerial.println("pring - show time of ring");
-        pcSerial.println("pset - set ring");
+        pcSerial.println(F("menu - show menu"));
+        pcSerial.println(F("pring - show time of ring"));
+        pcSerial.println(F("pset - set ring"));
         menuManager.setMenuCommand(MenuCommands::NONE_PRINT);
     }
 
@@ -90,9 +83,7 @@ void loop() {
             uint8_t lsecond = lnow.second();
             timerManager.ring(lhour, lminute, lsecond);
             printTimeFromRtc(lhour, lminute, lsecond);
-            lcd.setCursor(0, 1);
-            lcd.print("                ");
-            lcd.setCursor(0, 1);
+            lcdClear(1, lcd);
             lcd.print("Date:" + timerManager.getCurrentSetDate());
             delay(100);
         }
@@ -104,9 +95,7 @@ void loop() {
         uint8_t minutes = timerManager.getAcceptedTimeMinutes();
         uint8_t seconds = timerManager.getAcceptedTimeSeconds();
 
-        lcd.setCursor(0, 1);
-        lcd.print("                ");
-        lcd.setCursor(0, 1);
+        lcdClear(1, lcd);
         lcd.print("RingAt:");
         lcd.print(hours);
         lcd.print(':');

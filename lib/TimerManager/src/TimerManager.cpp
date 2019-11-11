@@ -1,30 +1,27 @@
 #include "TimerManager.h"
 #include "Constants.h"
 
-TimerManager::TimerManager(TMRpcm* tmrpcm, SoftwareSerial* pcSerial)
+TimerManager::TimerManager(TMRpcm* tmrpcm, CustomSoftwareSerial* pcSerial)
     : SerialInputOutputTemplate(pcSerial) {
     this->tmrpcm = tmrpcm;
     this->acceptedDate = "12:12:12";
     this->currentSetDate = "00:00:00";
-    this->fileName = "test.wav\0";
+    this->fileName = "test.wav";
 }
 
 void TimerManager::handleEnter() {
     if (this->isDateValid()) {
         this->timeAccepted = true;
         this->acceptedDate = this->currentSetDate;
-        this->getPcSerial()->println(this->acceptedDate);
         this->getPcSerial()->println();
     }
 }
 
 void TimerManager::handleBackspace() {
     if (this->currentSetDate.length() > 0) {
-        SoftwareSerial* pcSerial = this->getPcSerial();
-        pcSerial->print((char)ASCII_LINE_FEED);
+        CustomSoftwareSerial* pcSerial = this->getPcSerial();
+        clearPreviousLine(pcSerial);
         this->currentSetDate.remove(this->currentSetDate.length() - 1);
-        pcSerial->print("        ");
-        pcSerial->print((char)ASCII_LINE_FEED);
         pcSerial->print(this->currentSetDate);
     }
 }
@@ -82,7 +79,6 @@ uint8_t TimerManager::getAcceptedTimeHours() {
 }
 
 void TimerManager::ring(uint8_t hours, uint8_t minutes, uint8_t seconds) {
-    // this->getPcSerial()->println("Seconds " + this->getAcceptedTimeSeconds());
     if (shouldPlay) {
         this->playbackTime++;
         if (this->playbackTime == 40) {
