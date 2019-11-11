@@ -1,38 +1,42 @@
 #include "TimerManager.h"
 #include "Constants.h"
 
-TimerManager::TimerManager(TMRpcm* tmrpcm, SoftwareSerial* pcSerial) {
+TimerManager::TimerManager(TMRpcm* tmrpcm, SoftwareSerial* pcSerial)
+    : SerialInputOutputTemplate(pcSerial) {
     this->tmrpcm = tmrpcm;
-    this->pcSerial = pcSerial;
+    this->acceptedDate = "12:12:12";
+    this->currentSetDate = "00:00:00";
+    this->fileName = "test.wav\0";
 }
 
-void TimerManager::setDateIfSerialAvailable() {
-    if (this->pcSerial->available() > 0) {
-        uint8_t readed = this->pcSerial->read();
-        this->timeAccepted = false;
-        this->pcSerial->print((char)readed);
-        if (readed == ASCII_NEW_LINE || readed == ASCII_LINE_FEED) {
-            if (this->isDateValid()) {
-                this->timeAccepted = true;
-                this->acceptedDate = this->currentSetDate;
-                this->pcSerial->println();
-            }
-        } else if (readed == ASCII_BACKSPACE) {
-            if (this->currentSetDate.length() > 0) {
-                this->pcSerial->print((char)ASCII_LINE_FEED);
-                this->currentSetDate.remove(this->currentSetDate.length() - 1);
-                this->pcSerial->print("        ");
-                this->pcSerial->print((char)ASCII_LINE_FEED);
-                this->pcSerial->print(this->currentSetDate);
-            }
-        } else {
-            if (this->currentSetDate.length() > 8) {
-                this->currentSetDate = "";
-            }
-            this->currentSetDate.concat((char)readed);
-        }
+void TimerManager::handleEnter() {
+    if (this->isDateValid()) {
+        this->timeAccepted = true;
+        this->acceptedDate = this->currentSetDate;
+        this->getPcSerial()->println(this->acceptedDate);
+        this->getPcSerial()->println();
     }
 }
+
+void TimerManager::handleBackspace() {
+    if (this->currentSetDate.length() > 0) {
+        SoftwareSerial* pcSerial = this->getPcSerial();
+        pcSerial->print((char)ASCII_LINE_FEED);
+        this->currentSetDate.remove(this->currentSetDate.length() - 1);
+        pcSerial->print("        ");
+        pcSerial->print((char)ASCII_LINE_FEED);
+        pcSerial->print(this->currentSetDate);
+    }
+}
+
+void TimerManager::handleChange(uint8_t readed) {
+    if (this->currentSetDate.length() > 7) {
+        this->currentSetDate = "";
+    }
+    this->currentSetDate.concat((char)readed);
+}
+
+void TimerManager::handleBeforeSent() { this->timeAccepted = false; }
 
 String TimerManager::getCurrentSetDate() { return this->currentSetDate; }
 String TimerManager::getAcceptedDate() { return this->acceptedDate; }
@@ -78,6 +82,7 @@ uint8_t TimerManager::getAcceptedTimeHours() {
 }
 
 void TimerManager::ring(uint8_t hours, uint8_t minutes, uint8_t seconds) {
+    // this->getPcSerial()->println("Seconds " + this->getAcceptedTimeSeconds());
     if (shouldPlay) {
         this->playbackTime++;
         if (this->playbackTime == 40) {
@@ -95,7 +100,7 @@ void TimerManager::ring(uint8_t hours, uint8_t minutes, uint8_t seconds) {
             this->playbackTime = 0;
         }
         this->tmrpcm->setVolume(5);
-        this->tmrpcm->play("bonito.wav");
+        this->tmrpcm->play(this->fileName.begin());
     }
 }
 

@@ -53,11 +53,11 @@ void setup() {
     if (!RTC.isrunning()) {
         pcSerial.println("RTC is NOT running!");
         // This will reflect the time that your sketch was compiled
+        RTC.adjust(DateTime(__DATE__, __TIME__));
         return;
     }
-    RTC.adjust(DateTime(__DATE__, __TIME__));
     lcd.setCursor(0, 1);
-    lcd.print("Date:" + timerManager.getCurrentSetDate());
+    lcd.print("Date:" + timerManager.getAcceptedDate());
 }
 
 void loop() {
@@ -83,7 +83,7 @@ void loop() {
     if (currentCommand == MenuCommands::PSET) {
         timerManager.startSettingNewDate();
         while (!timerManager.isTimeAccepted()) {
-            timerManager.setDateIfSerialAvailable();
+            timerManager.setIfSerialAvailable();
             DateTime lnow = RTC.now();
             uint8_t lhour = lnow.hour();
             uint8_t lminute = lnow.minute();
@@ -94,11 +94,12 @@ void loop() {
             lcd.print("                ");
             lcd.setCursor(0, 1);
             lcd.print("Date:" + timerManager.getCurrentSetDate());
-            delay(250);
+            delay(100);
         }
         menuManager.setMenuCommand(MenuCommands::PRING);
     }
     if (currentCommand == MenuCommands::PRING) {
+
         uint8_t hours = timerManager.getAcceptedTimeHours();
         uint8_t minutes = timerManager.getAcceptedTimeMinutes();
         uint8_t seconds = timerManager.getAcceptedTimeSeconds();
@@ -114,5 +115,5 @@ void loop() {
         lcd.print(seconds);
         menuManager.setMenuCommand(MenuCommands::NONE_PRINT);
     }
-    delay(250);
+    delay(100);
 }

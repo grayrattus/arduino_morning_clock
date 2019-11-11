@@ -13,6 +13,7 @@ class SerialInputOutputTemplate {
     virtual void handleEnter();
     virtual void handleBackspace();
     virtual void handleChange(uint8_t readed);
+    virtual void handleBeforeSent();
     SoftwareSerial* getPcSerial();
    private:
     SoftwareSerial* pcSerial;

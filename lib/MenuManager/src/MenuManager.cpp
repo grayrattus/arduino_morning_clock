@@ -4,7 +4,7 @@
 
 MenuManager::MenuManager(SoftwareSerial* pcSerial)
     : SerialInputOutputTemplate(pcSerial) {
-    this->currentCommand = MenuCommands::MENU;
+    this->currentCommand = MenuCommands::NONE_PRINT;
 }
 
 void MenuManager::handleEnter() {

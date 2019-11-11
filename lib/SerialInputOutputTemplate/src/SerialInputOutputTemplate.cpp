@@ -7,6 +7,7 @@ SerialInputOutputTemplate::SerialInputOutputTemplate(SoftwareSerial* pcSerial) {
 
 void SerialInputOutputTemplate::setIfSerialAvailable() {
     if (this->pcSerial->available() > 0) {
+        this->handleBeforeSent();
         uint8_t readed = this->pcSerial->read();
         this->pcSerial->print((char)readed);
         if (readed == ASCII_NEW_LINE || readed == ASCII_LINE_FEED) {
@@ -21,4 +22,8 @@ void SerialInputOutputTemplate::setIfSerialAvailable() {
 
 SoftwareSerial* SerialInputOutputTemplate::getPcSerial() {
     return this->pcSerial;
+}
+
+void SerialInputOutputTemplate::handleBeforeSent(){
+
 }
